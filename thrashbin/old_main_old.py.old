@@ -1,0 +1,576 @@
+from fastapi import FastAPI, Depends
+import re
+from handler_funcs import *
+# from decimal import Decimal
+from database import *
+from fastapi.responses import FileResponse, JSONResponse
+import os
+import subprocess
+# from fastapi.responses import JSONResponse
+# import paramiko
+import psutil
+from fabric import Connection
+from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
+from pydantic import BaseModel
+from informative_scripts import *
+
+
+app = FastAPI()
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+class Queue:
+
+    def __init__(self):
+        self.queue = []
+        self.max_amount = 100
+        self.length = 0
+
+    def push(self, data):
+
+        if len(self.queue) > self.max_amount:
+            print("ananif")
+            self.queue.pop(0)
+            self.queue.append(data)
+
+            #while len(self.queue) > self.max_amount:
+            #    self.queue.pop(0)
+
+            self.length = len(self.queue)
+
+        else:
+            print("sec")
+            self.queue.append(data)
+            self.length = len(self.queue)
+
+    def change_max_amount(self, new_max_amount):
+        self.max_amount = new_max_amount
+
+    def get_data(self, num=100):
+
+        print(self.queue)
+
+        length = self.length
+
+        if num > length:
+            return self.queue
+        else:
+            sub_list = self.queue[-num:length]
+            return sub_list
+
+
+class TemperatureModel(BaseModel):
+    power: str
+    flag: str
+    env_temp_cur: str
+    future_timestamp: str
+    env_temp_15min: str
+    power_future_15min: str
+
+
+class MaintenanceModel(BaseModel):
+    power: str
+    flag: str
+    future_timestamp: str
+    power_future_15min: str
+    positive_3p: str
+    negative_3p: str
+    positive_7p: str
+    negative_7p: str
+
+
+queue_maintenance = Queue()
+queue_temperature = Queue()
+
+queue = Queue()
+mainintenance_queue = Queue()
+migration_queue = Queue()
+
+
+@app.get("/prom/aver")
+async def get_last_10_min_average_data():
+    
+    ip_dict = get_ips()
+    data_holder = {}
+    
+    for server in ip_dict:
+        data_holder[server] = handle_aver_last_min(ip_dict[server])
+
+    return data_holder
+
+
+@app.get("/prom/snmp/min")
+async def get_snmp_min_aveage(db: Session = Depends(get_db)):
+
+    data = db.query(SnmpMin).all()
+    empty_d = {}
+    titles = ["time_stamp", "voltage", "current", "pf", "energy", "power"]
+    print(data[0]) 
+    l = str(data[0].snmpdata).split(',')
+
+    print(len(l), len(titles))
+    for i in range(len(titles)):
+        empty_d[titles[i]] = l[i]
+
+    return empty_d
+
+@app.get("/prom/mixed/aver30")
+async def get_30_sec_average_data_mixed(db: Session = Depends(get_db)):
+
+    posts = db.query(Snmp_30sec).all()
+    initi = [0,0,0,0, 0]
+    emp = {}
+    titles = ["voltage", "current", "pf", "energy", "power"]
+
+    for post in posts:
+        adata = post.snmpdata
+        # print(post.snmpdata)
+        l = adata.split(',')
+        td = l[0]
+        l = l[1:len(l)]
+        
+        # t = post.timedata
+
+        for index in range(len(l)):
+            initi[index] += float(l[index])
+            # c=index
+
+    for i in range(len(initi)):
+
+        emp[titles[i]] = round(initi[i]/len(posts), 4)
+
+    print(len(initi), len(l))
+    print(len(post.snmpdata))
+    # print(initi)
+    # return emp # {"data": initi}
+    # posts = db.query
+    # return return_mixed_part()
+    dc = {**return_mixed_part(), **emp}
+    # dc["ts"] = td
+    return dc # {**return_mixed_part(), **emp}["ts"] = td
+    # didnt work out neither
+    # return(emp.update(return_mixed_part()))
+    
+    # return return_mixed_part() | emp
+    # naah for Python 3.9, too lazy to upgrade
+
+
+@app.get("/prom/aver/lastmin/{minu}")
+async def get_last_n_min_average_data(minu: int):
+
+    ip_dict = get_ips()
+    data_holder = {}
+
+    for server in ip_dict:
+        data_holder[server] = handle_aver_last_min(ip_dict[server], False, int(minu))
+
+    return data_holder
+
+
+@app.get("/prom/cur")
+async def get_current_prometheus_data():
+
+    ip_dict = get_ips()
+    data_holder = {}
+
+    for server in ip_dict:
+        data_holder[server] = return_cur(ip_dict[server])
+
+    return data_holder
+
+
+@app.get("/prom/snmp/cur")
+async def get_snmp_cur_data(db: Session = Depends(get_db)):
+
+    post = db.query(Snmp_cur).first()
+    emp = {}
+    titles = ["voltage", "current", "pf", "energy", "power"]
+
+    l = post.snmpdata.split(',')
+    l = l[1:len(l)]
+
+    for i in range(len(l)):
+
+        emp[titles[i]] = round(float(l[i]), 4)
+
+    return emp
+
+
+@app.get("/prom/snmp")
+async def get_snmp_10_min_data(db: Session = Depends(get_db)):
+     
+    posts = db.query(Snmp_10).all()
+    initi = [0,0,0,0, 0]
+    emp = {}
+    titles = ["voltage", "current", "pf", "energy", "power"]
+
+    for post in posts:
+        adata = post.snmpdata
+        # print(post.snmpdata)
+        l = adata.split(',')
+        l = l[1:len(l)]
+        t = post.timedata
+        
+        for index in range(len(l)):
+            initi[index] += float(l[index])
+            # c=index
+   
+    for i in range(len(initi)):
+
+        emp[titles[i]] = round(initi[i]/len(posts), 4)
+
+    # print(initi)
+    return emp # {"data": initi}
+    # posts = db.query
+
+"""
+@app.get("/prom/last/{stri}")
+def get_last_n_time_average_data(stri: str):
+
+    match = re.search(r'day=(\d+);hour=(\d+);minute=(\d+)', stri)
+
+    if match:
+        hour = int(match.group(1))
+        minute = int(match.group(2))
+    else:
+        print("Pattern not found in the endpoint string.")
+
+
+@app.get("/prom/interval/{stri}")
+def get_an_interval_average_data(stri: str):
+    
+    start_match = re.search(r'start=(\d{2}):(\d{2})_(\d{2})_(\d{2})_(\d{4})', input_string)
+    end_match = re.search(r'end=(\d{2}):(\d{2})_(\d{2})_(\d{2})_(\d{4})', input_string)
+    if start_match and end_match:
+        start_hour = int(start_match.group(1))
+        start_minute = int(start_match.group(2))
+        start_day = int(start_match.group(3))
+        start_month = int(start_match.group(4))
+        start_year = int(start_match.group(5))
+
+        end_hour = int(end_match.group(1))
+        end_minute = int(end_match.group(2))
+        end_day = int(end_match.group(3))
+        end_month = int(end_match.group(4))
+        end_year = int(end_match.group(5))
+
+    ...
+"""
+
+@app.get("/prom/smoothaver/{nhour}")
+async def get_smooth_n_hour_data(nhour: int):
+    return handle_aver_last_min(0, last10=None, go_hour_back=nhour)
+
+
+@app.get("/prom/day/{nday}")
+async def get_last_n_day_csv_data_and_download(nday:int):
+    cmd = ["ls ../out"]
+    organize_data(nday)
+
+    # pass
+    return FileResponse("/home/ubuntu/out/thefactory/1.csv")
+
+
+@app.get('/prom/pm_mac_details')
+async def get_physical_mac_details():
+
+    try:
+        node_ip = "10.150.1.30"
+
+        with Connection(host=node_ip, user="ubuntu", connect_kwargs={"password": "blc2022*"}) as c:
+            script_pm_mac_details = '''
+
+import subprocess
+
+
+def get_host_list():
+    output = subprocess.run(['openstack', 'hypervisor', 'list'], capture_output=True, text=True).stdout
+
+    rows = output.strip().split('\n')[2:]
+
+    indexes = []
+
+    for row in rows:
+
+        splitted = row.split('|')
+
+        if len(splitted)>1:
+            indexes.append(splitted[1].replace(" ", ""))
+
+    return indexes
+
+
+def get_host_details(index):
+    # Execute the command and capture output
+    output = subprocess.run(['openstack', 'hypervisor', 'show', str(index)], capture_output=True, text=True).stdout
+    #print(output)
+    # Process lines containing relevant data (modify as needed)
+    data = {}
+
+    for line in output.strip().split('\n'):
+
+        splitted = line.split("|")
+
+        if len(splitted) < 2:
+            continue
+
+        wout0 = splitted[1].replace(" ", "")
+        wout1 = splitted[2].replace(" ", "")
+
+        if wout0 == "aggregates":
+            wout1 = wout1[2:len(wout1)-2]
+            data[wout0] = wout1
+
+        elif wout0 in ["vcpus", "memory_mb", "aggregates", "host_ip", "local_gb", "hypervisor_hostname"]:
+            data[wout0] = wout1
+
+    return data
+
+print_data = {}
+
+
+for i in get_host_list():
+
+    details = get_host_details(i)
+
+    if details:
+        print_data[details["aggregates"]] = details
+
+
+print(print_data)
+
+'''
+
+            result = c.run("python3 -c '{}'".format(script_pm_mac_details), hide=True)
+
+            return {"res":result.stdout}
+
+    except Exception as e:
+        print(e)
+    
+
+
+@app.get('/prom/vm_mac_details')
+async def get_mac_details():
+    try:
+        node_ip = "10.150.1.30"
+
+        with Connection(host=node_ip, user="ubuntu", connect_kwargs={"password": "blc2022*"}) as c:
+
+            script_vm_mac_details = '''
+from openstack import connection
+import os
+
+# OpenStack kimlik bilgilerinizi ayarlayýn
+
+auth_url = "http://10.150.1.251:35357/v3"
+project_name = "admin"
+username = "admin"
+password = "WHMFjzLBHf1N6FxPnZpCDsXYdXewgjsvwju385Mk"
+user_domain_name = "Default"
+project_domain_name ="Default"
+
+
+# OpenStack ortamýna baðlantý oluþturun
+conn = connection.Connection(
+    auth_url=auth_url,
+    project_name=project_name,
+    username=username,
+    password=password,
+    user_domain_name=user_domain_name,
+    project_domain_name=project_domain_name,
+)
+
+
+# Sanal makineler (örnekler) hakkýnda bilgi alýn
+def get_virtual_machines():
+    compute_service = conn.compute
+    instances = compute_service.servers()
+    return instances
+
+
+
+def get_vm_by_id(vm_id):
+  
+    compute_service = conn.compute
+    try:
+        vm = compute_service.get_server(vm_id)
+        
+        flav = vm.flavor.copy()
+
+        flav["host"] = vm.availability_zone
+
+        return vm.name, flav
+    
+    except Exception as e:
+        print(f"Error retrieving VM with ID {vm_id}: {e}")
+        return None
+
+
+def get_flavors():
+
+    data = {}
+    virtual_machines = get_virtual_machines()
+
+    for vm in virtual_machines:
+        name, flavor = get_vm_by_id(vm.id)
+
+        data[name] = flavor
+
+    return {"result": data}
+
+
+print(get_flavors())
+
+        '''
+
+            result = c.run("python3 -c '{}'".format(script), hide=True)
+        
+            return {"res":result.stdout}
+
+    except Exception as e:
+        print(e)
+
+
+"""
+@app.get("/prom/phy_mac/{iplast}")
+async def get_psutil_script_data_phy_machine(iplast):
+    try:
+        # Establish an SSH connection to the remote node
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        node_ip = "10.150.1." + iplast
+
+        ssh.connect(node_ip, username="ubuntu", password="blc2022*")
+        # Define the script to run on the remote node
+        script = '''
+import psutil
+
+memory = psutil.virtual_memory()
+disk = psutil.disk_usage('/')
+
+cpu_count = psutil.cpu_count()
+
+total_memory = memory.total
+available_memory = memory.available
+used_memory = memory.used
+free_memory = memory.free
+
+disk_total = disk.total
+disk_used = disk.used
+disk_free = disk.free
+
+print(f"{{'total_memory': {{total_memory}}, 'available_memory': {{available_memory}}, 'used_memory': {{used_memory}}, 'free_memory': {{free_memory}}, 'disk_total': {{disk_total}}, 'disk_used': {{disk_used}}, 'disk_free': {{disk_free}}}}}")
+        '''
+
+        # Execute the script on the remote node
+        stdin, stdout, stderr = ssh.exec_command(script_vm_mac_details)
+        data = stdout.read().decode('utf-8')
+        ssh.close()
+
+        return JSONResponse(content=data)
+
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+        """
+
+
+@app.post('/prom/push/maintenance_data')
+async def push_chart_data_maintenance(data: MaintenanceModel):
+    queue_maintenance.push(data)
+    print(data)
+
+    return data
+
+
+@app.post('/prom/push/temperature_data')
+async def push_chart_data_temperature(data: TemperatureModel):
+    queue_temperature.push(data)
+    print(data)
+
+    return data
+
+
+@app.get('/prom/get_chart_data/temperature/{n}')
+async def get_n_chart_data(n: int):
+    data = queue_temperature.get_data(n)
+    # print(data)
+    return {"data": data}
+
+
+@app.get('/prom/get_chart_data/temperature')
+async def get_all_chart_data():
+    data = queue_temperature.get_data()
+    # print(data)
+    return {"data": data}
+
+
+@app.get('/prom/get_chart_data/maintenance/{n}')
+async def get_n_chart_data(n: int):
+    data = queue_maintenance.get_data(n)
+    # print(data)
+    return {"data": data}
+
+
+@app.get('/prom/get_chart_data/maintenance')
+async def get_all_chart_data():
+    data = queue_maintenance.get_data()
+    # print(data)
+    return {"data": data}
+
+
+@app.get("/prom/phy_mac/{iplast}")
+async def get_psutil_script_data_phy_machine(iplast):
+    try:
+        node_ip = "10.150.1." + iplast
+        with Connection(host=node_ip, user="ubuntu", connect_kwargs={"password": "blc2022*"}) as c:
+            script_phy_mac = """
+import psutil
+
+memory = psutil.virtual_memory()
+disk = psutil.disk_usage("/")
+
+cpu_count = psutil.cpu_count()
+
+total_memory = memory.total / (1024 ** 3)
+available_memory= memory.available / (1024 ** 3)
+used_memory= memory.used / (1024 ** 3)
+free_memory= memory.free / (1024 ** 3)
+
+disk_total = disk.total / (1024 ** 3)
+disk_used= disk.used / (1024 ** 3)
+disk_free= disk.free / (1024 ** 3)
+
+values = [f"{cpu_count:.2f}", f"{total_memory:.3f}", f"{available_memory:.3f}", f"{used_memory:.3f}", f"{free_memory:.3f}", f"{disk_total:.3f}", f"{disk_used:.3f}", f"{disk_free:.3f}"]
+names = ["cpu_count","total_memory(GB)","available_memory(GB)","used_memory(GB)","free_memory(GB)","disk_total(GB)","disk_used(GB)","disk_free(GB)"]
+
+def make_queue(value, name):
+    message_queue = ""
+    for i in range (len(value)):
+        if i < len(value)-1:
+            message_queue += f"{name[i]}-{value[i]}/"
+        else:
+            message_queue += f"{name[i]}-{value[i]}"
+    return message_queue
+
+message= make_queue(values,names)
+print(message)
+"""
+            c.run("pip install psutil", hide=True)
+            result = c.run("python3 -c '{}'".format(script_phy_mac), hide=True)
+            # c.run("pip install psutil", hide=True)
+            return {"res":result.stdout}
+    except Exception as e:
+        return {error: f"An error occurred: {e}"}
+            
+

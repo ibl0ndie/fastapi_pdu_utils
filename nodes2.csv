@@ -1,0 +1,64 @@
+query_name,query,description
+Memory Usage Percentage,"100 - ((node_memory_MemAvailable_bytes{instance=$} * 100) / node_memory_MemTotal_bytes{instance=$})",memory used percentage
+Memory Apps,"(node_memory_MemTotal_bytes{instance=$} - node_memory_MemFree_bytes{instance=$} - node_memory_Buffers_bytes{instance=$} - node_memory_Cached_bytes{instance=$} - node_memory_Slab_bytes{instance=$} - node_memory_PageTables_bytes{instance=$} - node_memory_SwapCached_bytes{instance=$})/(1024*1024)",used memory by applications
+Memory Pagetables,"node_memory_PageTables_bytes{instance=$}/(1024*1024)",used memory for to map between virtual and physical memory address
+Memory Slab,"node_memory_Slab_bytes{instance=$}/(1024*1024)",Memory used by the kernel to cache data structures for its own use (caches like inode or dentry etc)
+Memory Cache,"node_memory_Cached_bytes{instance=$}/(1024*1024)",cache parked file data
+Memory Buffer,"node_memory_Buffers_bytes{instance=$}/(1024*1024)",Block device(eg. Hard Disk) cache
+Free Memory,"node_memory_MemFree_bytes{instance=$}/(1024*1024)",Free memory
+Cpu Core Number,"count(count(node_cpu_seconds_total{instance=$})%20by%20(cpu))", number of cores of cpu
+Cpu Mode System Load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22system%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Processes executing in kernel mode
+Cpu Mode User Load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22user%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Processes executing in user mode e.g. applications
+Cpu Mode SoftIRQ load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22softirq%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",processing software interrupts
+Cpu Mode Idle,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22idle%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Time Spent while cpu is sitting idle
+Cpu Busy(Used Percentage),"(sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode!=%22idle%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))) * 100",Cpu used percentage
+Disk Space Used,"(node_filesystem_size_bytes{instance=$,device!~'rootfs'} - node_filesystem_avail_bytes{instance=$,device!~'rootfs'})/(1024*1024)", Used storage
+Memory mapped,"node_memory_Mapped_bytes{instance=$}/(1024*1024)", Used memory in mapped pages file which has been mmapped
+Memory Shmem,"node_memory_Shmem_bytes{instance=$}/(1024*1024)", Used Shared Memory(shared between several processes thus including RAM disks)
+Network Transmitted lo,"irate(node_network_transmit_bytes_total{instance=$,device=%22lo%22}[#])*8/(1024*1024)", Transmitted data of network in megabytes
+Guest Time spent to run virtual cpu on guest,"sum by(instance) (irate(node_cpu_guest_seconds_total{instance=$, mode=%22user%22}[1m#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[1m#])))", time spent running a virtual cpu for a guest operating system
+VMAllocTotal vmalloc total,"node_memory_VmallocTotal_bytes{instance=$}/(1024*1024)", Total size of vmalloc memory area
+VMAllocUsed used vmalloc,"node_memory_VmallocUsed_bytes{instance=$}/(1024*1024)", amount of used vmalloc area
+Memory in Anonymous Huge Bytes,"node_memory_AnonHugePages_bytes{instance=$}/(1024*1024)", memory in anonymous huge bytes anonhugebytes
+Memory Anonymous Bytes,"node_memory_AnonPages_bytes{instance=$}/(1024*1024)",memory in user pages not backed up by files
+Memory Kernel Stack,"node_memory_KernelStack_bytes{instance=$}/(1024*1024)", kernel memory stack not reclaimable
+Memory PerCPU Bytes,"node_memory_Percpu_bytes{instance=$}/(1024*1024)", Per CPU memory allocated dynamically by loadable modules
+Memory Huge Page Size,"node_memory_Hugepagesize_bytes{instance=$}/(1024*1024)", Huge Page Size
+Memory mapped as 1G,"node_memory_DirectMap1G_bytes{instance=$}/(1024*1024)", Amount of memory mapped as this size
+Memory Mapped as 1M,"node_memory_DirectMap2M_bytes{instance=$}/(1024*1024)", Amount of memory mapped as this size
+Memory Mapped as 4K,"node_memory_DirectMap4k_bytes{instance=$}/(1024*1024)", Amount of memory mapped as this size
+Memory Pages in operations,"irate(node_vmstat_pgpgin{instance=$}[#])", page in operations memory
+Memory Pages out operations,"irate(node_vmstat_pgpgout{instance=$}[#])", page out operations memory
+Memory Page faults,"irate(node_vmstat_pgfault{instance=$}[#])", memory page fault operations minor and major
+Time Offset,"node_timex_offset_seconds{instance=$}", Time offset between local system and reference clock time syncronized drift
+Time Maximum Error in seconds,"node_timex_maxerror_seconds{instance=$}", Time syncronized drift maximum errror in secs
+Time PPL Adjust,"node_timex_loop_time_constant{instance=$}", Time PPL Adjust
+Processes in Runnable State,"node_procs_running{instance=$}", Processes in Runable State
+CPU Running Process Secs,"irate(node_schedstat_running_seconds_total{instance=$}[#])", cpu seconds spent running a process[make it per cpu#]
+CPU Waiting secs.,"irate(node_schedstat_waiting_seconds_total{instance=$}[#])",seconds spent by processing waiting for this cpu[make it per cpu#]
+Context Switches,"irate(node_context_switches_total{instance=$}[#])", Context Switches
+Context Interrupts,"irate(node_intr_total{instance=$}[#])", Context INterrrupts
+System Load 1m,"node_load1{instance=$}", system load one minute
+System Load 5m,"node_load5{instance=$}", system load five minute
+System Load 15m,"node_load15{instance=$}", system load fifteen minute
+Schdeule Timeslices executed by each CPU,"irate(node_schedstat_timeslices_total{instance=$}[#])",Schdeule Timeslices executed by each CPU[make it per cpu#]
+Entropy,"node_entropy_available_bits{instance=$}", entropy availbale to random number generators
+CPU time spent on process,"irate(process_cpu_seconds_total{instance=$}[#])", cpu time spent in user and system contents
+Packets Received device lo,"irate(node_network_receive_packets_total{instance=$,device=%22lo%22}[#])", Network Traffic By Packets Received Packets total number of lo
+Packets Transmitted lo,"irate(node_network_transmit_packets_total{instance=$,device=%22lo%22}[#])",Network Traffic By Packets Transmitted total number of lo
+Softnet Packets Processed,"sum by(instance)(irate(node_softnet_processed_total{instance=$}[#]))",total softnet processed packets rated
+TCP Sockstat Memory Bytes,"node_sockstat_TCP_mem_bytes{instance=$}/(1024*1024)",TCP sockstat memory bytes
+UDP Sockstat Memory Bytes,"node_sockstat_UDP_mem_bytes{instance=$}/(1024*1024)",UDP sockstat memory bytes
+Sockstat TCP Allocated Sockets,"node_sockstat_TCP_alloc{instance=$}",Sockstat TCP Allocated Sockets
+Sockstat TCP Inuse,"node_sockstat_TCP_inuse{instance=$}",Sockstat TCP tcp sockets currently in use
+Sockstat TCP Memory,"node_sockstat_TCP_mem{instance=$}",Sockstat TCP used memory
+Sockstat TCP waiting,"node_sockstat_TCP_tw{instance=$}",Sockstat TCP Sockets Waiting for to close
+Sockstat UDP Inuse,"node_sockstat_UDP_inuse{instance=$}",Sockstat Udp in use
+Sockstat UDP Memory,"node_sockstat_UDP_mem{instance=$}",Used memory for udp
+TCP Connections established/close,"node_netstat_Tcp_CurrEstab{instance=$}",TCP Connections for which the current state is either established or close-wait
+Datagrams Received,"irate(node_netstat_Udp_InDatagrams{instance=$}[#])",UDP in datagrams received
+DataGrams Sent,"irate(node_netstat_Udp_OutDatagrams{instance=$}[#])",UDO datagrams sent
+Netstat Received Octets,"irate(node_netstat_IpExt_InOctets{instance=$}[#])",netstat ip in octets
+Netstat Sent Octets,"irate(node_netstat_IpExt_OutOctets{instance=$}[#])",netstat ip out octets
+TCP Segments Received,"irate(node_netstat_Tcp_InSegs{instance=$}[#])",segments received including errors count of currently established connections
+TCP Segments Sent,"irate(node_netstat_Tcp_OutSegs{instance=$}[#])",segments sent on current connections but excluding those contain only transmitted octets

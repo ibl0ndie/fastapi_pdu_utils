@@ -1,0 +1,119 @@
+[
+    {
+        "power": "91.0275",
+        "flag": "still not time yet",
+        "env_temp_cur": "25.072049314169004",
+        "now_timestamp": "2025-06-18 10:59:00",
+        "future_timestamp": "2025-06-18 11:02:00",
+        "env_temp_min": "25.365550629905215",
+        "power_future_min": "122.629638671875"
+    },
+    {
+        "power": "89.2425",
+        "flag": "still not time yet",
+        "env_temp_cur": "25.055471327026147",
+        "now_timestamp": "2025-06-18 11:00:00",
+        "future_timestamp": "2025-06-18 11:03:00",
+        "env_temp_min": "25.36732652253908",
+        "power_future_min": "122.82085418701172"
+    },
+    {
+        "power": "89.41",
+        "flag": "still not time yet",
+        "env_temp_cur": "25.057026964475128",
+        "now_timestamp": "2025-06-18 11:01:00",
+        "future_timestamp": "2025-06-18 11:04:00",
+        "env_temp_min": "25.368848179735437",
+        "power_future_min": "122.98469543457031"
+    },
+    {
+        "power": "89.205",
+        "flag": "it is fine",
+        "env_temp_cur": "25.055123049985333",
+        "now_timestamp": "2025-06-18 11:02:00",
+        "future_timestamp": "2025-06-18 11:05:00",
+        "env_temp_min": "25.369567521475012",
+        "power_future_min": "123.06214904785156"
+    },
+    {
+        "power": "90.7875",
+        "flag": "it is fine",
+        "env_temp_cur": "25.06982034110778",
+        "now_timestamp": "2025-06-18 11:03:00",
+        "future_timestamp": "2025-06-18 11:06:00",
+        "env_temp_min": "25.370243356927347",
+        "power_future_min": "123.13491821289062"
+    },
+    {
+        "power": "89.23",
+        "flag": "it is fine",
+        "env_temp_cur": "25.055355234679208",
+        "now_timestamp": "2025-06-18 11:04:00",
+        "future_timestamp": "2025-06-18 11:07:00",
+        "env_temp_min": "25.37085322437736",
+        "power_future_min": "123.2005844116211"
+    },
+    {
+        "power": "89.8175",
+        "flag": "it is fine",
+        "env_temp_cur": "25.06081157498533",
+        "now_timestamp": "2025-06-18 11:06:00",
+        "future_timestamp": "2025-06-18 11:09:00",
+        "env_temp_min": "25.37134065068021",
+        "power_future_min": "123.25306701660156"
+    },
+    {
+        "power": "89.75",
+        "flag": "it is fine",
+        "env_temp_cur": "25.060184676311863",
+        "now_timestamp": "2025-06-18 11:07:00",
+        "future_timestamp": "2025-06-18 11:10:00",
+        "env_temp_min": "25.371692031263994",
+        "power_future_min": "123.29090118408203"
+    },
+    {
+        "power": "90.1625",
+        "flag": "still not time yet",
+        "env_temp_cur": "25.064015723760843",
+        "now_timestamp": "2025-06-18 11:08:00",
+        "future_timestamp": "2025-06-18 11:11:00",
+        "env_temp_min": "25.37166836497745",
+        "power_future_min": "123.2883529663086"
+    },
+    {
+        "power": "89.41499999999999",
+        "flag": "it is fine",
+        "env_temp_cur": "25.057073401413902",
+        "now_timestamp": "2025-06-18 11:09:00",
+        "future_timestamp": "2025-06-18 11:12:00",
+        "env_temp_min": "25.371156138673722",
+        "power_future_min": "123.23320007324219"
+    },
+    {
+        "power": "89.35",
+        "flag": "it is fine",
+        "env_temp_cur": "25.056469721209822",
+        "now_timestamp": "2025-06-18 11:10:00",
+        "future_timestamp": "2025-06-18 11:13:00",
+        "env_temp_min": "25.370496812936256",
+        "power_future_min": "123.1622085571289"
+    },
+    {
+        "power": "89.39250000000001",
+        "flag": "it is fine",
+        "env_temp_cur": "25.056864435189414",
+        "now_timestamp": "2025-06-18 11:11:00",
+        "future_timestamp": "2025-06-18 11:14:00",
+        "env_temp_min": "25.37024881292754",
+        "power_future_min": "123.13550567626953"
+    },
+    {
+        "power": "89.495",
+        "flag": "it is fine",
+        "env_temp_cur": "25.05781639243431",
+        "now_timestamp": "2025-06-18 11:13:00",
+        "future_timestamp": "2025-06-18 11:16:00",
+        "env_temp_min": "25.370279706642908",
+        "power_future_min": "123.13883209228516"
+    }
+]
