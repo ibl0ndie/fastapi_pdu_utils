@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field, validator
 import asyncio
 import time
 
-from your_project.settings import SSH_USER, SSH_KEY_PATH, STRESS_LEVELS  # Adjust this import to your actual path
+from settings import SSH_USER, SSH_KEY_PATH, STRESS_LEVELS  # Adjust this import to your actual path
 
 router = APIRouter(prefix="/stress", tags=["Stress"])
 
@@ -145,13 +145,3 @@ async def stop_stress(vms: List[str] = Body(..., min_items=1)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
-@router.get("/stop")
-async def stop_stress_single():
-    try:
-        node_ip = "10.150.1.34"
-        with Connection(host=node_ip, user="ubuntu", connect_kwargs={"password": "blc2022*"}) as c:
-            c.run("bash /home/ubuntu/stop_sc.sh", hide=True)
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))

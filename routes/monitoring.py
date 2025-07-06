@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
 import requests as rq
-from your_project.models import InputDataModel, LogFile
-from your_project.queues import (
+from utils.models import InputDataModel
+from utils.enums import  LogFile
+from utils.queues import (
     queue_maintenance,
     queue_temperature,
     queue_migration,
