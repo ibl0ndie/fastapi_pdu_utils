@@ -7,7 +7,7 @@ class Queue:
         self.queue = []
         self.max_amount = 100
         self.length = 0
-        self.file_name = file_name
+        self.file_name = "json/" + file_name
         self.save_ct = 0
         
         try:

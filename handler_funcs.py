@@ -15,6 +15,8 @@ _fastapi_app = None
 def set_global_app(app):
     global _fastapi_app
     _fastapi_app = app
+    
+#USED ONE
 async def get_ips2():
     session = _fastapi_app.state.session
 
@@ -30,7 +32,7 @@ async def get_ips2():
 
     return serv_dict
 
-
+#USED ONE 
 async def handle_aver_last_min2(server, last10=True, nmin=10):
     now = datetime.utcnow()
     start = now - timedelta(minutes=nmin)
@@ -40,9 +42,9 @@ async def handle_aver_last_min2(server, last10=True, nmin=10):
 
     return await handleit2(start, end, step, step_func, server)
 
-
+#USED ONE 
 async def handleit2(start, end, step, step_func, server):
-    df_nodes = pd.read_csv("nodes2.csv")
+    df_nodes = pd.read_csv("csv/nodes2.csv")
     session = _fastapi_app.state.session
 
     json_h = {}
@@ -65,7 +67,7 @@ async def handleit2(start, end, step, step_func, server):
 
     return json_h
 
-
+#USED ONE 
 async def fetch_json2(session, url):
     try:
         async with session.get(url) as resp:
@@ -80,17 +82,20 @@ async def fetch_json2(session, url):
     except Exception as e:
         print(f"❌ Error fetching from Prometheus: {e}")
         return {}
-
+    
+#USED ONE 
 def curly_organizer2(string, ip, step_func="5m"):
     return string.replace("$", ip).replace("#", step_func)
 #    string = string.replace("$", f'"{ip}"').replace("#", step_func)
 #    return string
 
+
+#USED ONE 
 def organize_url2(query, start, end, step="5s"):
     url_str = query.replace("\"", "%22").replace("+", "%2B").replace("*", "%2A")
     return f"{prometheus_domain}/api/v1/query_range?query={url_str}&start={start}&end={end}&step={step}"
 
-
+#USED ONE 
 async def return_instance2(which="", start=give_default_dates()[0], end=give_default_dates()[1], st_num=0):
     async with aiohttp.ClientSession() as session:
         if which == "node":
@@ -126,6 +131,58 @@ async def return_instance2(which="", start=give_default_dates()[0], end=give_def
         else:
             return -1
 
+def get_actual_snmps_nmin(nmin):
+    end_1 = datetime.utcnow()
+
+    req = rq.get(f'{prometheus_domain}/api/v1/query?query=pdu_power').json()
+    compute_order = {}
+    data_len = len(req['data']['result'])
+
+    for i in range(data_len):
+        compute_order[req['data']['result'][i]['metric']['compute_id']] = i
+
+    start_1 = end_1 - timedelta(minutes=nmin)
+
+    emp = {}
+
+    for i in compute_order:
+
+        start = start_1.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        end = end_1.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+
+        pdu_list = ['pdu_power', 'pdu_energy', 'pdu_current', 'pdu_voltage', 'pdu_pf', 'time_stamp']
+        data_d = {}
+
+        # once = True
+        now = datetime.now()
+
+        for elem in pdu_list:
+
+        # data_arr = np.array(data['data']['result'][0]['values'])
+
+        # data_arr = data_arr[:,1].reshape(-1)
+        # data_arr = data_arr.astype(float)
+
+            if elem == 'time_stamp':
+                query = f"{prometheus_domain}/api/v1/query_range?query=pdu_pf&start={start}&end={end}&step=1s"
+                data = rq.get(query).json()
+                time_data = [i[0] for i in data['data']['result'][compute_order[i]]['values']]
+            else:
+                query = f"{prometheus_domain}/api/v1/query_range?query={elem}&start={start}&end={end}&step=1s"
+                data = rq.get(query).json()
+                data_arr = [float(i[1]) for i in data['data']['result'][compute_order[i]]['values']]
+                aver = sum(data_arr) / len(data_arr)
+
+                data_d[elem] = aver
+        
+        emp[i] = data_d
+
+    return emp
+
+
+
+#---------------------------------------------------------
+
 
 
 
@@ -137,7 +194,7 @@ def handle_aver_last_min(server, last10=True, nmin=10, go_hour_back=None):
     
     def handleit(start, end, step, step_func, server):
 
-        df_nodes = pd.read_csv("nodes2.csv")
+        df_nodes = pd.read_csv("csv/nodes2.csv")
         execute_once = True
         json_h = {}
 
@@ -246,195 +303,6 @@ def handle_aver_last_min(server, last10=True, nmin=10, go_hour_back=None):
         
             return handleit(start, now, step, step_func, server)
 
-
-def get_actual_snmps_nmin(nmin):
-    end_1 = datetime.utcnow()
-
-    req = rq.get(f'{prometheus_domain}/api/v1/query?query=pdu_power').json()
-    compute_order = {}
-    data_len = len(req['data']['result'])
-
-    for i in range(data_len):
-        compute_order[req['data']['result'][i]['metric']['compute_id']] = i
-
-    start_1 = end_1 - timedelta(minutes=nmin)
-
-    emp = {}
-
-    for i in compute_order:
-
-        start = start_1.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        end = end_1.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-
-        pdu_list = ['pdu_power', 'pdu_energy', 'pdu_current', 'pdu_voltage', 'pdu_pf', 'time_stamp']
-        data_d = {}
-
-        # once = True
-        now = datetime.now()
-
-        for elem in pdu_list:
-
-        # data_arr = np.array(data['data']['result'][0]['values'])
-
-        # data_arr = data_arr[:,1].reshape(-1)
-        # data_arr = data_arr.astype(float)
-
-            if elem == 'time_stamp':
-                query = f"{prometheus_domain}/api/v1/query_range?query=pdu_pf&start={start}&end={end}&step=1s"
-                data = rq.get(query).json()
-                time_data = [i[0] for i in data['data']['result'][compute_order[i]]['values']]
-            else:
-                query = f"{prometheus_domain}/api/v1/query_range?query={elem}&start={start}&end={end}&step=1s"
-                data = rq.get(query).json()
-                data_arr = [float(i[1]) for i in data['data']['result'][compute_order[i]]['values']]
-                aver = sum(data_arr) / len(data_arr)
-
-                data_d[elem] = aver
-        
-        emp[i] = data_d
-
-    return emp
-
-
-def get_snmps_nmin(n, time_unit='m', compute_name='compute3'):
-
-    end = datetime.now()
-    
-    req = rq.get('{prometheus_domain}/api/v1/query?query=pdu_power').json()
-    compute_order = {}
-    data_len = len(req['data']['result'])
-
-    for i in range(data_len):
-        compute_order[req['data']['result'][i]['metric']['compute_id']] = i
-        
-    if time_unit == 'm':
-
-        start = end - timedelta(minutes=n)
-
-        divisions = [[start, end]]
-
-    if time_unit == 'h':
-        start = end - timedelta(hours=n)
-        # [[start, end]...]
-        isOdd = i // 2 == 1
-        # for 5: 0 2 2 4 4 5
-        # start - end relative data
-
-        divisions = [[end-timedelta(hours=2*i+2), end-timedelta(hours=(2*i))] for i in range(n // 2)]
-        
-        if isOdd:
-            i = n // 2
-            al =  [end-timedelta(hours=2*i+1), end-timedelta(hours=(2*i))]
-
-            divisions.append(al)
-
-    if time_unit == 'd':
-        start = end - timedelta(hours=24*n)
-        
-        # for 5: 0 2 2 4 4 5
-        # start - end relative data
-
-        divisions = [[end-timedelta(hours=2*i+2), end-timedelta(hours=(2*i))] for i in range(n*12)]
-    
-    #print(divisions)
-    once = True
-
-    for subdiv in divisions:
-        
-        start = subdiv[0]
-        end = subdiv[1]
-
-        start = start.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        end = end.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-    
-        pdu_list = ['pdu_power', 'pdu_energy', 'pdu_current', 'pdu_voltage', 'pdu_pf', 'time_stamp']
-        data_d = {}
-    
-        # once = True
-        now = datetime.now() 
-
-        
-        for elem in pdu_list:
-
-        # data_arr = np.array(data['data']['result'][0]['values'])
-        
-        # data_arr = data_arr[:,1].reshape(-1)
-        # data_arr = data_arr.astype(float)
-        
-            if elem == 'time_stamp':
-                query = f"{prometheus_domain}/api/v1/query_range?query=pdu_pf&start={start}&end={end}&step=1s"
-                data = rq.get(query).json()
-                time_data = [i[0] for i in data['data']['result'][compute_order[compute_name]]['values']]
-                data_d[elem] = time_data
-            else:
-                query = f"{prometheus_domain}/api/v1/query_range?query={elem}&start={start}&end={end}&step=1s"
-                data = rq.get(query).json()
-                data_arr = [i[1] for i in data['data']['result'][compute_order[compute_name]]['values']]
-                data_d[elem] = data_arr
-        
-        if once:
-
-            hold_df = pd.DataFrame(data=data_d, columns=pdu_list)
-            once = False
-        
-        else:
-            print('else')
-            df = pd.DataFrame(data=data_d, columns=pdu_list)
-            hold_df = pd.concat((hold_df, df), axis=0, ignore_index=True)
-    
-    def time_changer2(time):
-        return datetime.fromtimestamp(time)
-
-    # df['Date Time'] = pd.to_datetime(df['Date Time'])
-    hold_df['time_stamp'] = hold_df.apply(lambda x: time_changer2(x['time_stamp']), axis=1)
-
-    hold_df.to_csv(f'/home/ubuntu/myenv/myenv/{compute_name}.csv')
-
-    return True
-
-
-def get_snmps():
-    
-    data_js = rq.get(f"{prometheus_domain}/api/v1/query?query=pdu_power").json()
-    return data_js
-
-
-def get_name_snmp():
-    a = {i['metric']['compute_id']:i['value'][1] for i in get_snmps()['data']['result']}
-
-    # data_js = rq.get("http://10.50.1.167:9090/api/v1/query?query=pdu_power").json()
-    return a
-
-
-def scraper_dict_cr():
-    power_data_js, energy_data_js, current_data_js, voltage_data_js, pf_data_js = get_all_pdu_metrics()
-
-    power = {i['metric']['compute_id']:i['value'][1] for i in power_data_js['data']['result']}
-    voltage = {i['metric']['compute_id']:i['value'][1] for i in voltage_data_js['data']['result']}
-    current = {i['metric']['compute_id']:i['value'][1] for i in current_data_js['data']['result']}
-    pf = {i['metric']['compute_id']:i['value'][1] for i in pf_data_js['data']['result']}
-    energy = {i['metric']['compute_id']:i['value'][1] for i in energy_data_js['data']['result']}
-    
-    empty = {"data": []}
-
-    for i in power:
-        print(i)
-        print(power)
-        a = {}
-
-        if True:
-            a["host"] = i
-            a["power"] = power[i]
-            a["voltage"] = voltage[i]
-            a["current"] = current[i]
-            a["pf"] = pf[i]
-            a["energy"] = energy[i]
-
-        empty["data"].append(a)
-
-    return empty
-
-
 def get_all_pdu_metrics():
 
     power_data_js = rq.get(f"{prometheus_domain}/api/v1/query?query=pdu_power").json()
@@ -504,7 +372,7 @@ def return_cur(server):
     else:
         server = 0
 
-    df_nodes = pd.read_csv("nodes2.csv")
+    df_nodes = pd.read_csv("csv/nodes2.csv")
     data = {}
 
     for name, col in df_nodes.iterrows():
@@ -739,7 +607,7 @@ def return_mixed_part():
 
     def handleit(start, end, step, step_func, server):
 
-        df_nodes = pd.read_csv("nodes2.csv")
+        df_nodes = pd.read_csv("csv/nodes2.csv")
         execute_once = True
         json_h = {}
 
