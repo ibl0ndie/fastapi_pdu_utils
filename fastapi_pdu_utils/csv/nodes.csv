@@ -1,0 +1,112 @@
+query_name,query,description
+Memory Usage Percentage,"100 - ((node_memory_MemAvailable_bytes{instance=$} * 100) / node_memory_MemTotal_bytes{instance=$})",memory used percentage
+Memory Apps,"(node_memory_MemTotal_bytes{instance=$} - node_memory_MemFree_bytes{instance=$} - node_memory_Buffers_bytes{instance=$} - node_memory_Cached_bytes{instance=$} - node_memory_Slab_bytes{instance=$} - node_memory_PageTables_bytes{instance=$} - node_memory_SwapCached_bytes{instance=$})/(1024*1024)",used memory by applications
+Memory Pagetables,"node_memory_PageTables_bytes{instance=$}/(1024*1024)",used memory for to map between virtual and physical memory address
+Memory Swap Cache,"node_memory_SwapCached_bytes{instance=$}/(1024*1024)",cache memory which is not processed yet
+Memory Slab,"node_memory_Slab_bytes{instance=$}/(1024*1024)",Memory used by the kernel to cache data structures for its own use (caches like inode or dentry etc)
+Memory Cache,"node_memory_Cached_bytes{instance=$}/(1024*1024)",cache parked file data
+Memory Buffer,"node_memory_Buffers_bytes{instance=$}/(1024*1024)",Block device(eg. Hard Disk) cache
+Free Memory,"node_memory_MemFree_bytes{instance=$}/(1024*1024)",Free memory
+Swap Space Used,"(node_memory_SwapTotal_bytes{instance=$} - node_memory_SwapFree_bytes{instance=$})/(1024*1024)",Swap space used
+Swap Used Percentage,"((node_memory_SwapTotal_bytes{instance=$} - node_memory_SwapFree_bytes{instance=$}) / (node_memory_SwapTotal_bytes{instance=$} )) * 100",swap usage percentage
+Hardware Corrupted,"node_memory_HardwareCorrupted_bytes{instance=$}/(1024*1024)",Amount Of Ram Kernel identified as corrupted not working
+Cpu Core Number, count(count(node_cpu_seconds_total{instance=$) by (cpu)), number of cores of cpu
+Cpu Mode System Load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22system%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Processes executing in kernel mode
+Cpu Mode User Load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22user%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Processes executing in user mode e.g. applications
+Cpu Mode Nice Load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22nice%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Executed Niced processes by cpu
+Cpu Mode IOwait Load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22iowait%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Cpu proportion waiting for I/O to complete
+Cpu Mode IRQ load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22irq%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Cpu propotion Servicing interrupts
+Cpu Mode SoftIRQ load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22softirq%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",processing software interrupts
+Cpu Mode Steal load,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22steal%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Time spent in other OS when running a VM
+Cpu Mode Idle,"sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode=%22idle%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))",Time Spent while cpu is sitting idle
+Cpu Busy(Used Percentage),"(sum by(instance) (irate(node_cpu_seconds_total{instance=$, mode!=%22idle%22}[#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[#])))) * 100",Cpu used percentage
+Disk Reads Completed,"irate(node_disk_reads_completed_total{instance=$}[#])",vda reads completed
+Disk Writes Completed,"irate(node_disk_writes_completed_total{instance=$}[#])",vda writes comleted
+Disk Read Megabytes,"irate(node_disk_read_bytes_total{instance=$}[#])/(1024*1024)",Read Mbs
+Disk Written Megabytes,"irate(node_disk_written_bytes_total{instance=$}[#])/(1024*1024)",Written Mbs
+I/O Utilization,"irate(node_disk_io_time_seconds_total{instance=$} [#])",i/o utilization (device=~'') add
+Disk Space Used,"(node_filesystem_size_bytes{instance=$,device!~'rootfs'} - node_filesystem_avail_bytes{instance=$,device!~'rootfs'})/(1024*1024)", Used storage
+Memory mapped,"node_memory_Mapped_bytes{instance=$}/(1024*1024)", Used memory in mapped pages file which has been mmapped
+Memory Shmem,"node_memory_Shmem_bytes{instance=$}/(1024*1024)", Used Shared Memory(shared between several processes thus including RAM disks)
+Memory Shemhugepages,"node_memory_ShmemHugePages_bytes{instance=$}/(1024*1024)",Memory used by shared memory shmem and tmpfs allocated with huge pages
+Memory Shempmd Mapped Pages,"node_memory_ShmemPmdMapped_bytes{instance=$}/(1024*1024)", Amount of shared (shem/tmpfs) memory backed by huge pages
+Network Received ens3,"irate(node_network_receive_bytes_total{instance=$,device=%22ens3%22}[#])*8/(1024*1024)", Received data by network device ens3
+Network Transmitted ens3,"irate(node_network_transmit_bytes_total{instance=$,device=%22ens3%22}[#])*8/(1024*1024)", Transmitted data of network in megabytes
+Network Transmitted lo,"irate(node_network_transmit_bytes_total{instance=$,device=%22lo%22}[#])*8/(1024*1024)", Transmitted data of network in megabytes
+Guest Time spent to run virtual cpu on guest,"sum by(instance) (irate(node_cpu_guest_seconds_total{instance=$, mode=%22user%22}[1m#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[1m#])))", time spent running a virtual cpu for a guest operating system
+GuestNice time spent running nice guest vCPUs,"sum by(instance) (irate(node_cpu_guest_seconds_total{instance=$, mode=%22nice%22}[1m#])) / on(instance) group_left sum by (instance)((irate(node_cpu_seconds_total{instance=$}[1m#])))",time spent running a virtual niced cpu for a guest operating system
+VMAllocChunk vmlloc area,"node_memory_VmallocChunk_bytes{instance=$}/(1024*1024)", largest contigious  block of vmalloc area wihch is free
+VMAllocTotal vmalloc total,"node_memory_VmallocTotal_bytes{instance=$}/(1024*1024)", Total size of vmalloc memory area
+VMAllocUsed used vmalloc,"node_memory_VmallocUsed_bytes{instance=$}/(1024*1024)", amount of used vmalloc area
+Memory in Anonymous Huge Bytes,"node_memory_AnonHugePages_bytes{instance=$}/(1024*1024)", memory in anonymous huge bytes anonhugebytes
+Memory Anonymous Bytes,"node_memory_AnonPages_bytes{instance=$}/(1024*1024)",memory in user pages not backed up by files
+Memory Kernel Stack,"node_memory_KernelStack_bytes{instance=$}/(1024*1024)", kernel memory stack not reclaimable
+Memory PerCPU Bytes,"node_memory_Percpu_bytes{instance=$}/(1024*1024)", Per CPU memory allocated dynamically by loadable modules
+Memory Huge Page total,"node_memory_HugePages_Total{instance=$}",Total Size of the pool of huge pages
+Memory Huge Page Size,"node_memory_Hugepagesize_bytes{instance=$}/(1024*1024)", Huge Page Size
+Memory mapped as 1G,"node_memory_DirectMap1G_bytes{instance=$}/(1024*1024)", Amount of memory mapped as this size
+Memory Mapped as 1M,"node_memory_DirectMap2M_bytes{instance=$}/(1024*1024)", Amount of memory mapped as this size
+Memory Mapped as 4K,"node_memory_DirectMap4k_bytes{instance=$}/(1024*1024)", Amount of memory mapped as this size
+Memory NFS Unstable,"node_memory_NFS_Unstable_bytes{instance=$}/(1024*1024)", Memory in NFS Pages sent to the server but note yet commited to the storage
+Memory Pages in operations,"irate(node_vmstat_pgpgin{instance=$}[#])", page in operations memory
+Memory Pages out operations,"irate(node_vmstat_pgpgout{instance=$}[#])", page out operations memory
+Memory Pages SWapped in,"irate(node_vmstat_pswpin{instance=$}[#])", memory pages swapped in
+Memory Pages Swapped out,"irate(node_vmstat_pswpout{instance=$}[#])", memory pages swapped out
+Memory Page faults,"irate(node_vmstat_pgfault{instance=$}[#])", memory page fault operations minor and major
+Memory vmstat OOM Killer,"irate(node_vmstat_oom_kill{instance=$}[#])", vmstat oom killer
+Time Offset,"node_timex_offset_seconds{instance=$}", Time offset between local system and reference clock time syncronized drift
+Time Maximum Error in seconds,"node_timex_maxerror_seconds{instance=$}", Time syncronized drift maximum errror in secs
+Time PPL Adjust,"node_timex_loop_time_constant{instance=$}", Time PPL Adjust
+Processes Blocked,"node_procs_blocked{instance=$}", Processes Blocked Waiting for I/O to complete
+Processes in Runnable State,"node_procs_running{instance=$}", Processes in Runable State
+CPU Running Process Secs,"irate(node_schedstat_running_seconds_total{instance=$}[#])", cpu seconds spent running a process[make it per cpu#]
+CPU Waiting secs.,"irate(node_schedstat_waiting_seconds_total{instance=$}[#])",seconds spent by processing waiting for this cpu[make it per cpu#]
+Context Switches,"irate(node_context_switches_total{instance=$}[#])", Context Switches
+Context Interrupts,"irate(node_intr_total{instance=$}[#])", Context INterrrupts
+System Load 1m,"node_load1{instance=$}", system load one minute
+System Load 5m,"node_load5{instance=$}", system load five minute
+System Load 15m,"node_load15{instance=$}", system load fifteen minute
+Schdeule Timeslices executed by each CPU,"irate(node_schedstat_timeslices_total{instance=$}[#])",Schdeule Timeslices executed by each CPU[make it per cpu#]
+Entropy,"node_entropy_available_bits{instance=$}", entropy availbale to random number generators
+CPU time spent on process,"irate(process_cpu_seconds_total{instance=$}[#])", cpu time spent in user and system contents
+Read Wait Time Avg,"irate(node_disk_read_time_seconds_total{instance=$}[#]) / irate(node_disk_reads_completed_total{instance=$}[#])", Disk Averate Wait Time Read
+Write Wait Time Avg,"irate(node_disk_write_time_seconds_total{instance=$}[#]) / irate(node_disk_writes_completed_total{instance=$}[#])", Disk Averate Wait Time Write
+Average Queue Size,"irate(node_disk_io_time_weighted_seconds_total{instance=$}[#])",Average Queue Size
+Time Spent Doing I/O discard,"irate(node_disk_discard_time_seconds_total{instance=$}[#])",Time spent doing i/o discard time total rated
+Packets Received device ens3,"irate(node_network_receive_packets_total{instance=$,device=%22ens3%22}[#])",Network Traffic By Packets Received Packets total number of ens3
+Packets Received device lo,"irate(node_network_receive_packets_total{instance=$,device=%22lo%22}[#])", Network Traffic By Packets Received Packets total number of lo
+Packets Transmitted ens3,"irate(node_network_transmit_packets_total{instance=$,device=%22ens3%22}[#])",Network Traffic By Packets Transmitted total number of ens3
+Packets Transmitted lo,"irate(node_network_transmit_packets_total{instance=$,device=%22lo%22}[#])",Network Traffic By Packets Transmitted total number of lo
+Received Errors Total,"sum by(instance)(irate(node_network_receive_errs_total{instance=$}[#]))", total received errors
+Transmitted Errors Total,"sum by(instance)(irate(node_network_transmit_errs_total{instance=$}[#]))", total transmitted errors
+Softnet Packets Processed,"sum by(instance)(irate(node_softnet_processed_total{instance=$}[#]))",total softnet processed packets rated
+Softnet Packets Dropped,"sum by(instance)(irate(node_softnet_dropped_total{instance=$}[#]))", total softnet dropped packets rated
+TCP Sockstat Memory Bytes,"node_sockstat_TCP_mem_bytes{instance=$}/(1024*1024)",TCP sockstat memory bytes
+UDP Sockstat Memory Bytes,"node_sockstat_UDP_mem_bytes{instance=$}/(1024*1024)",UDP sockstat memory bytes
+FRAG Memory,"node_sockstat_FRAG_memory{instance=$}",node memory for frag
+Sockstat TCP Allocated Sockets,"node_sockstat_TCP_alloc{instance=$}",Sockstat TCP Allocated Sockets
+Sockstat TCP Inuse,"node_sockstat_TCP_inuse{instance=$}",Sockstat TCP tcp sockets currently in use
+Sockstat TCP Memory,"node_sockstat_TCP_mem{instance=$}",Sockstat TCP used memory
+Sockstat TCP Orphan,"node_sockstat_TCP_orphan{instance=$}",Sockstat TCP Orphan Sockets
+Sockstat TCP waiting,"node_sockstat_TCP_tw{instance=$}",Sockstat TCP Sockets Waiting for to close
+Sockstat UDP Inuse,"node_sockstat_UDP_inuse{instance=$}",Sockstat Udp in use
+Sockstat Udplite Inuse,"node_sockstat_UDPLITE_inuse{instance=$}",Uplite Sockets currently in use
+Sockstat UDP Memory,"node_sockstat_UDP_mem{instance=$}",Used memory for udp
+TCP Connections established/close,"node_netstat_Tcp_CurrEstab{instance=$}",TCP Connections for which the current state is either established or close-wait
+Datagrams Received,"irate(node_netstat_Udp_InDatagrams{instance=$}[#])",UDP in datagrams received
+DataGrams Sent,"irate(node_netstat_Udp_OutDatagrams{instance=$}[#])",UDO datagrams sent
+Netstat Received Octets,"irate(node_netstat_IpExt_InOctets{instance=$}[#])",netstat ip in octets
+Netstat Sent Octets,"irate(node_netstat_IpExt_OutOctets{instance=$}[#])",netstat ip out octets
+TCP Segments Received,"irate(node_netstat_Tcp_InSegs{instance=$}[#])",segments received including errors count of currently established connections
+TCP Segments Sent,"irate(node_netstat_Tcp_OutSegs{instance=$}[#])",segments sent on current connections but excluding those contain only transmitted octets
+TCP Error overflowed,"irate(node_netstat_TcpExt_ListenOverflows{instance=$}[#])",Times the listen queue of a socket is overflowed
+TCP Error listendrop,"irate(node_netstat_TcpExt_ListenDrops{instance=$}[#])",SYNs to listen sockets ignored
+TCP Error Retrans,"irate(node_netstat_TcpExt_TCPSynRetrans{instance=$}[#])",SYN-SYN/ACK retransmits to break down retransmissions in SYN fast/timeout retransmits
+TCP Error Retransegs,"irate(node_netstat_Tcp_RetransSegs{instance=$}[#])",Segments retransmitted - that is the number of TCP segments transmitted containing one or more previously transmitted octets
+TCP Segment Error Received,"irate(node_netstat_Tcp_InErrs{instance=$}[#])",Segments received in error(bad checksums)
+TCP Out RST flag,"irate(node_netstat_Tcp_OutRsts{instance=$}[#])",Segments sent with RST flag
+UDP Inerrors,"irate(node_netstat_Udp_InErrors{instance=$}[#])",UDP Datagrams that could not be delivered to an application
+UDP Noports,"irate(node_netstat_Udp_NoPorts{instance=$}[#])",UDP datagrams received on a port with no listener
+UDPlite inerrors,"irate(node_netstat_UdpLite_InErrors{instance=$}[#])",UDPlite Datagrams that could not be delivered to an application
+UDP Buffer Errors received,"irate(node_netstat_Udp_RcvbufErrors{instance=$}[#])",UDP buffer errors received
+UDP Buffer Errors sent,"irate(node_netstat_Udp_SndbufErrors{instance=$}[#])",UDP buffer errors sent
