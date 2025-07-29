@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+aiohttp
+pandas
+requests
+fastapi-cache2
+python-multipart
+pydantic
+fabric

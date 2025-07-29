@@ -8,9 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 from fastapi_cache.decorator import cache
-
 # from decimal import Decimal
-from final.utils.async_request import fetch_data
+from utils.async_request import fetch_data
 from handler_funcs import *
 from informative_scripts import *
 from routes.migration import router as migration_router
@@ -23,6 +22,8 @@ from utils.enums import LogFile
 from utils.models import ApprovalRequest  # ... import other models as needed
 from utils.models import MigrationDecModel, TemperatureModel
 from utils.queue import Queue
+from fastapi import FastAPI
+
 
 app = FastAPI()
 origins = ["*"]
