@@ -1,0 +1,38 @@
+[
+    {
+        "data_center": "BLC",
+        "id": 1,
+        "physical_machines": [
+            {
+                "status": "open",
+                "name": "compute4",
+                "power_consumption": 149.30703278688515,
+                "vms": {
+                    "active": [
+                        {
+                            "status": "open",
+                            "name": "BLC-AYPOS-Development-9",
+                            "power": 17.65351634067188,
+                            "confg": {
+                                "cpu": 2,
+                                "ram": 1,
+                                "disk": 8
+                            }
+                        },
+                        {
+                            "status": "open",
+                            "name": "BLC-AYPOS-Development-8",
+                            "power": 31.93641877323592,
+                            "confg": {
+                                "cpu": 1,
+                                "ram": 2,
+                                "disk": 8
+                            }
+                        }
+                    ],
+                    "inactive": []
+                }
+            }
+        ]
+    }
+]

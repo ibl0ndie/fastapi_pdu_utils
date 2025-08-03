@@ -1,0 +1,145 @@
+[
+    {
+        "power": "91.0275",
+        "flag": "not time yet",
+        "now_timestamp": "2025-06-18 10:59:00",
+        "future_timestamp": "2025-06-18 11:02:00",
+        "power_future_min": "128.3526153564453",
+        "positive_3p": "132.20319381713867",
+        "negative_3p": "124.50203689575196",
+        "positive_7p": "137.33729843139648",
+        "negative_7p": "119.36793228149413"
+    },
+    {
+        "power": "89.2425",
+        "flag": "not time yet",
+        "now_timestamp": "2025-06-18 11:00:00",
+        "future_timestamp": "2025-06-18 11:03:00",
+        "power_future_min": "128.44918823242188",
+        "positive_3p": "132.30266387939454",
+        "negative_3p": "124.59571258544922",
+        "positive_7p": "137.44063140869142",
+        "negative_7p": "119.45774505615235"
+    },
+    {
+        "power": "89.2675",
+        "flag": "not time yet",
+        "now_timestamp": "2025-06-18 11:01:00",
+        "future_timestamp": "2025-06-18 11:04:00",
+        "power_future_min": "128.7350311279297",
+        "positive_3p": "132.59708206176757",
+        "negative_3p": "124.8729801940918",
+        "positive_7p": "137.74648330688476",
+        "negative_7p": "119.7235789489746"
+    },
+    {
+        "power": "89.31",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:02:00",
+        "future_timestamp": "2025-06-18 11:05:00",
+        "power_future_min": "128.9846954345703",
+        "positive_3p": "132.85423629760743",
+        "negative_3p": "125.1151545715332",
+        "positive_7p": "138.01362411499025",
+        "negative_7p": "119.95576675415039"
+    },
+    {
+        "power": "90.7875",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:03:00",
+        "future_timestamp": "2025-06-18 11:06:00",
+        "power_future_min": "129.06910705566406",
+        "positive_3p": "132.94118026733398",
+        "negative_3p": "125.19703384399413",
+        "positive_7p": "138.10394454956054",
+        "negative_7p": "120.03426956176757"
+    },
+    {
+        "power": "89.23",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:04:00",
+        "future_timestamp": "2025-06-18 11:07:00",
+        "power_future_min": "129.17318725585938",
+        "positive_3p": "133.04838287353516",
+        "negative_3p": "125.29799163818359",
+        "positive_7p": "138.21531036376953",
+        "negative_7p": "120.13106414794922"
+    },
+    {
+        "power": "89.89500000000001",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:06:00",
+        "future_timestamp": "2025-06-18 11:09:00",
+        "power_future_min": "129.24078369140625",
+        "positive_3p": "133.11800720214845",
+        "negative_3p": "125.36356018066407",
+        "positive_7p": "138.28763854980468",
+        "negative_7p": "120.19392883300782"
+    },
+    {
+        "power": "89.825",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:07:00",
+        "future_timestamp": "2025-06-18 11:10:00",
+        "power_future_min": "129.3056182861328",
+        "positive_3p": "133.1847868347168",
+        "negative_3p": "125.42644973754882",
+        "positive_7p": "138.3570115661621",
+        "negative_7p": "120.25422500610351"
+    },
+    {
+        "power": "90.3425",
+        "flag": "not time yet",
+        "now_timestamp": "2025-06-18 11:08:00",
+        "future_timestamp": "2025-06-18 11:11:00",
+        "power_future_min": "129.40870666503906",
+        "positive_3p": "133.29096786499022",
+        "negative_3p": "125.52644546508789",
+        "positive_7p": "138.4673161315918",
+        "negative_7p": "120.35009719848632"
+    },
+    {
+        "power": "89.4675",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:09:00",
+        "future_timestamp": "2025-06-18 11:12:00",
+        "power_future_min": "129.61929321289062",
+        "positive_3p": "133.50787200927735",
+        "negative_3p": "125.7307144165039",
+        "positive_7p": "138.69264373779296",
+        "negative_7p": "120.54594268798829"
+    },
+    {
+        "power": "89.43",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:10:00",
+        "future_timestamp": "2025-06-18 11:13:00",
+        "power_future_min": "129.88522338867188",
+        "positive_3p": "133.78178009033203",
+        "negative_3p": "125.98866668701172",
+        "positive_7p": "138.9771890258789",
+        "negative_7p": "120.79325775146484"
+    },
+    {
+        "power": "89.39250000000001",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:11:00",
+        "future_timestamp": "2025-06-18 11:14:00",
+        "power_future_min": "130.2369842529297",
+        "positive_3p": "134.14409378051758",
+        "negative_3p": "126.3298747253418",
+        "positive_7p": "139.35357315063476",
+        "negative_7p": "121.12039535522462"
+    },
+    {
+        "power": "89.495",
+        "flag": "Problem in the Device",
+        "now_timestamp": "2025-06-18 11:13:00",
+        "future_timestamp": "2025-06-18 11:16:00",
+        "power_future_min": "130.62583923339844",
+        "positive_3p": "134.54461441040038",
+        "negative_3p": "126.70706405639649",
+        "positive_7p": "139.76964797973633",
+        "negative_7p": "121.48203048706054"
+    }
+]
